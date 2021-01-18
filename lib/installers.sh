@@ -41,6 +41,25 @@ install_dmg_pkg() {
 }
 export -f install_dmg_pkg
 
+# Installs a package via a URL.
+# Parameters: $1 (required) - URL, $2 (required) - Application name.
+install_url_pkg() {
+  local url="$1"
+  local url_hash=$(md5 -q -s $url)
+  local tmp_download_path="/tmp/$url_hash"
+  local app_name="$2"
+  local install_path=$(get_install_path "$app_name")
+
+  if [[ ! -e "$install_path" ]]; then
+    download_file "$url" "$tmp_download_path/"
+    install_pkg "$tmp_download_path" "$app_name"
+    rm -r "$tmp_download_path"
+    printf "Installed: $app_name.\n"
+    verify_application "$app_name"
+  fi
+}
+export -f install_dmg_pkg
+
 # Installs an application via a zip file.
 # Parameters: $1 (required) - URL, $2 (required) - Application name.
 install_zip_app() {
